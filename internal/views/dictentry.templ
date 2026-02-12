@@ -1,0 +1,93 @@
+package views
+
+import "github.com/firamisu/louis/internal/domain"
+
+templ Entry(entry domain.Entry) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ entry.Word }</title>
+			<style>
+				body {
+					font-family: system-ui, -apple-system, sans-serif;
+					max-width: 760px;
+					margin: 2.5rem auto;
+					line-height: 1.65;
+					color: #222;
+				}
+				h1 {
+					margin: 0.4em 0 0.1em;
+					font-size: 3.2rem;
+				}
+				.phonetic {
+					color: #555;
+					font-size: 1.5rem;
+					margin: 0.3em 0 1.2em;
+				}
+				.origin {
+					color: #666;
+					font-style: italic;
+					margin: 1.4em 0 2em;
+					font-size: 0.98rem;
+				}
+				.meaning {
+					margin: 2.2em 0;
+				}
+				.pos {
+					font-weight: 700;
+					color: #0066cc;
+					text-transform: capitalize;
+					font-size: 1.4rem;
+					border-bottom: 2px solid #eee;
+					padding-bottom: 0.35em;
+					display: inline-block;
+					margin-bottom: 0.6em;
+				}
+				.def {
+					margin: 1em 0 1em 1.8em;
+					position: relative;
+				}
+				.def::before {
+					content: "•";
+					position: absolute;
+					left: -1.4em;
+					color: #888;
+				}
+				.example {
+					color: #444;
+					font-style: italic;
+					margin: 0.5em 0 0.5em 1.2em;
+				}
+				.example::before {
+					content: "→";
+					margin-right: 0.6em;
+					color: #777;
+				}
+			</style>
+		</head>
+		<body>
+			<h1>{ entry.Word }</h1>
+			if entry.Phonetic != "" {
+				<div class="phonetic">/{ entry.Phonetic }/</div>
+			}
+			if entry.Origin != "" {
+				<div class="origin">Origin: { entry.Origin }</div>
+			}
+			for _, meaning := range entry.Meanings {
+				<div class="meaning">
+					<div class="pos">{ meaning.PartOfSpeech }</div>
+					for _, def := range meaning.Definitions {
+						<div class="def">
+							{ def.Definition }
+							if def.Example != "" {
+								<div class="example">{ def.Example }</div>
+							}
+						</div>
+					}
+				</div>
+			}
+		</body>
+	</html>
+}

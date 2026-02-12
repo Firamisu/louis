@@ -5,7 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/firamisu/louis/internal/subtitles"
+	"github.com/firamisu/louis/internal/dictclient"
+	"github.com/firamisu/louis/internal/dictionary"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -24,9 +25,12 @@ func (app *application) mount() http.Handler {
 		w.Write([]byte("healthy"))
 	})
 
-	subtitlesSvc := subtitles.NewService()
-	subtitlesHandler := subtitles.NewHandler(subtitlesSvc)
-	r.Get("/subtitles", subtitlesHandler.List)
+	dictionarySvc := dictionary.NewService(
+		dictclient.NewDictClient(),
+	)
+	dictionaryHandler := dictionary.NewHandler(dictionarySvc)
+
+	r.Get("/{word}", dictionaryHandler.Word)
 
 	return r
 }
