@@ -1,0 +1,36 @@
+name: Deploy to Azure
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [closed]
+
+jobs:
+  deploy:
+    if: github.event_name != 'pull_request' || (github.event.pull_request != null && github.event.pull_request.merged == true)
+    permissions:
+      id-token: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure CLI Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          appSourcePath: ${{ github.workspace }}
+          acrName: acrfr
+          containerAppName: louis-app
+          resourceGroup: louis
+          containerAppEnvironment: louis-env
+          imageToBuild: acrfr.azurecr.io/louis/louis:latest
